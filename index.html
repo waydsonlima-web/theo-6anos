@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Confirmação de Presença</title>
   <style>
-    /* Nome do arquivo da imagem que você colocará na mesma pasta no GitHub */
     :root {
       --imagem-convite: url('convite.jpg');
     }
@@ -25,7 +24,7 @@
       min-height: 100vh;
     }
 
-    /* Tela Inicial */
+    /* Tela Inicial - Imagem Ampliada */
     #landingScreen {
       display: flex;
       flex-direction: column;
@@ -33,25 +32,29 @@
       justify-content: center;
       cursor: pointer;
       text-align: center;
-      padding: 20px;
+      padding: 15px;
+      width: 100%;
+      min-height: 100vh;
     }
 
     #landingScreen img {
-      max-width: 90vw;
-      max-height: 80vh;
+      width: 100%;
+      max-width: 750px; /* Aumentado a largura máxima */
+      max-height: 88vh;  /* Aumentado a altura máxima */
+      object-fit: contain;
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
       transition: transform 0.2s;
     }
 
     #landingScreen img:hover {
-      transform: scale(1.02);
+      transform: scale(1.01);
     }
 
     .click-hint {
       margin-top: 15px;
-      font-size: 1.1rem;
-      color: #555;
+      font-size: 1.2rem;
+      color: #444;
       font-weight: 600;
       animation: pulse 1.5s infinite;
     }
@@ -62,7 +65,7 @@
       100% { opacity: 0.6; }
     }
 
-    /* Tela do Formulário com Marca D'água */
+    /* Tela do Formulário */
     #formScreen {
       display: none;
       width: 100%;
@@ -164,7 +167,7 @@
       <form id="rsvpForm" onsubmit="enviarFormulario(event)">
         <div class="form-group">
           <label for="nome">Nome e Sobrenome *</label>
-          <input type="text" id="nome" required placeholder="Seu nome completo">
+          <input type="text" id="nome" required placeholder="Seu nome completo" oninput="sincronizarNomePrincipal()">
         </div>
 
         <div class="form-group">
@@ -209,9 +212,12 @@
       document.getElementById('formScreen').style.display = 'flex';
     }
 
+    // Gera os campos e preenche automaticamente o Participante 1
     function gerarCamposParticipantes() {
       const qtd = parseInt(document.getElementById('qtdPessoas').value) || 0;
       const container = document.getElementById('participantesContainer');
+      const nomePrincipal = document.getElementById('nome').value;
+      
       container.innerHTML = '';
 
       for (let i = 1; i <= qtd; i++) {
@@ -227,9 +233,25 @@
         input.required = true;
         input.placeholder = `Nome completo do participante ${i}`;
 
+        // Se for o Participante 1, vincula ID e preenche com o nome principal
+        if (i === 1) {
+          input.id = 'participante1';
+          if (nomePrincipal) {
+            input.value = nomePrincipal;
+          }
+        }
+
         div.appendChild(label);
         div.appendChild(input);
         container.appendChild(div);
+      }
+    }
+
+    // Atualiza o Participante 1 dinamicamente se o campo "Nome e Sobrenome" for alterado
+    function sincronizarNomePrincipal() {
+      const p1 = document.getElementById('participante1');
+      if (p1) {
+        p1.value = document.getElementById('nome').value;
       }
     }
 
