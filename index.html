@@ -1,1 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmação de Presença</title>
+  <style>
+    /* Nome do arquivo da imagem que você colocará na mesma pasta no GitHub */
+    :root {
+      --imagem-convite: url('convite.jpg');
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f4f4f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Tela Inicial */
+    #landingScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #landingScreen img {
+      max-width: 90vw;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    #landingScreen img:hover {
+      transform: scale(1.02);
+    }
+
+    .click-hint {
+      margin-top: 15px;
+      font-size: 1.1rem;
+      color: #555;
+      font-weight: 600;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    /* Tela do Formulário com Marca D'água */
+    #formScreen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      padding: 40px 20px;
+      background: linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)), var(--imagem-convite) center/cover no-repeat fixed;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .form-container {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #007bff;
+    }
+
+    .participante-item {
+      margin-top: 10px;
+      padding-left: 10px;
+      border-left: 3px solid #007bff;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    #mensagemSucesso {
+      display: none;
+      text-align: center;
+      color: #28a745;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TELA INICIAL -->
+  <div id="landingScreen" onclick="abrirFormulario()">
+    <img src="convite.jpg" alt="Convite de Aniversário" id="imgConvite">
+    <div class="click-hint">Clique no convite para confirmar sua presença ✨</div>
+  </div>
+
+  <!-- TELA DO FORMULÁRIO -->
+  <div id="formScreen">
+    <div class="form-container">
+      <h2>Confirmação de Presença</h2>
+      
+      <form id="rsvpForm" onsubmit="enviarFormulario(event)">
+        <div class="form-group">
+          <label for="nome">Nome e Sobrenome *</label>
+          <input type="text" id="nome" required placeholder="Seu nome completo">
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">Número de Telefone *</label>
+          <input type="tel" id="telefone" required placeholder="(00) 00000-0000">
+        </div>
+
+        <div class="form-group">
+          <label for="qtdPessoas">Quantidade de Pessoas *</label>
+          <select id="qtdPessoas" required onchange="gerarCamposParticipantes()">
+            <option value="">Selecione...</option>
+            <option value="1">1 pessoa</option>
+            <option value="2">2 pessoas</option>
+            <option value="3">3 pessoas</option>
+            <option value="4">4 pessoas</option>
+            <option value="5">5 pessoas</option>
+            <option value="6">6 pessoas</option>
+            <option value="7">7 pessoas</option>
+            <option value="8">8 pessoas</option>
+            <option value="9">9 pessoas</option>
+            <option value="10">10 pessoas</option>
+          </select>
+        </div>
+
+        <div id="participantesContainer"></div>
+
+        <button type="submit" id="btnEnviar">Enviar Confirmação</button>
+      </form>
+
+      <div id="mensagemSucesso">
+        🎉 Presença confirmada com sucesso! Esperamos você na festa!
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Substitua pela URL que você copiou no Passo 1
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwpGFNeY9JPiGVG0OkZSbQmX3xMT7eM51OeNPzFFaqvASNz6-6KrTu_Ep1_-Nkzg/exec";
+
+    function abrirFormulario() {
+      document.getElementById('landingScreen').style.display = 'none';
+      document.getElementById('formScreen').style.display = 'flex';
+    }
+
+    function gerarCamposParticipantes() {
+      const qtd = parseInt(document.getElementById('qtdPessoas').value) || 0;
+      const container = document.getElementById('participantesContainer');
+      container.innerHTML = '';
+
+      for (let i = 1; i <= qtd; i++) {
+        const div = document.createElement('div');
+        div.className = 'form-group participante-item';
+        
+        const label = document.createElement('label');
+        label.innerText = `Nome do Participante ${i} *`;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'nome-participante';
+        input.required = true;
+        input.placeholder = `Nome completo do participante ${i}`;
+
+        div.appendChild(label);
+        div.appendChild(input);
+        container.appendChild(div);
+      }
+    }
+
+    function enviarFormulario(event) {
+      event.preventDefault();
+      
+      const btn = document.getElementById('btnEnviar');
+      btn.disabled = true;
+      btn.innerText = 'Enviando...';
+
+      const inputsParticipantes = document.querySelectorAll('.nome-participante');
+      const participantes = Array.from(inputsParticipantes).map(input => input.value);
+
+      const dados = {
+        nome: document.getElementById('nome').value,
+        telefone: document.getElementById('telefone').value,
+        qtdPessoas: document.getElementById('qtdPessoas').value,
+        participantes: participantes
+      };
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dados)
+      })
+      .then(() => {
+        document.getElementById('rsvpForm').style.display = 'none';
+        document.getElementById('mensagemSucesso').style.display = 'block';
+      })
+      .catch(error => {
+        alert('Ocorreu um erro ao enviar. Tente novamente.');
+        btn.disabled = false;
+        btn.innerText = 'Enviar Confirmação';
+      });
+    }
+  </script>
+</body>
+</html>
