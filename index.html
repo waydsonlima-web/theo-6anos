@@ -39,8 +39,8 @@
 
     #landingScreen img {
       width: 100%;
-      max-width: 750px; /* Aumentado a largura máxima */
-      max-height: 88vh;  /* Aumentado a altura máxima */
+      max-width: 750px;
+      max-height: 88vh;
       object-fit: contain;
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.25);
@@ -111,6 +111,13 @@
       border-radius: 6px;
       font-size: 1rem;
       outline: none;
+    }
+
+    /* Estilo para campos somente leitura */
+    input[readonly] {
+      background-color: #e9ecef;
+      color: #495057;
+      cursor: not-allowed;
     }
 
     input:focus, select:focus {
@@ -212,7 +219,6 @@
       document.getElementById('formScreen').style.display = 'flex';
     }
 
-    // Gera os campos e preenche automaticamente o Participante 1
     function gerarCamposParticipantes() {
       const qtd = parseInt(document.getElementById('qtdPessoas').value) || 0;
       const container = document.getElementById('participantesContainer');
@@ -233,9 +239,10 @@
         input.required = true;
         input.placeholder = `Nome completo do participante ${i}`;
 
-        // Se for o Participante 1, vincula ID e preenche com o nome principal
+        // Se for o Participante 1, torna somente leitura (bloqueado para edição)
         if (i === 1) {
           input.id = 'participante1';
+          input.readOnly = true;
           if (nomePrincipal) {
             input.value = nomePrincipal;
           }
@@ -247,7 +254,6 @@
       }
     }
 
-    // Atualiza o Participante 1 dinamicamente se o campo "Nome e Sobrenome" for alterado
     function sincronizarNomePrincipal() {
       const p1 = document.getElementById('participante1');
       if (p1) {
